@@ -10,7 +10,6 @@ import java.awt.Point;
         import javax.swing.JFrame;
         import javax.swing.JLabel;
 
-        import jdk.nashorn.api.tree.ImportEntryTree;
         import org.opencv.calib3d.Calib3d;
         import org.opencv.core.*;
         import org.opencv.imgproc.Imgproc;
@@ -24,7 +23,7 @@ import java.awt.Point;
 public class optic {
     public static void main(String[] args) {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        Mat lmaeft = Imgcodecs.imread("C:/Users/User/Downloads/mrizka.jpg");
+        Mat image = Imgcodecs.imread("C:/Users/User/Downloads/mrizka.jpg");
         Mat lmaeft1 = Imgcodecs.imread("C:/Users/User/Downloads/valec.jpg");
         JFrame window = new JFrame();
         JFrame window1 = new JFrame();
@@ -36,7 +35,7 @@ public class optic {
         Core.subtract(lmaeft1, new Scalar(b,b,b), vysledek);
         Core.multiply(vysledek, new Scalar(a,a,a), vysledek);
         Mat kelner = getStructuringElement(MORPH_RECT, new Size(10, 10));
-        Core.absdiff(lmaeft,vysledek,vysledek);
+        Core.absdiff(image,vysledek,vysledek);
         Imgproc.morphologyEx(vysledek, vysledek, MORPH_OPEN, kelner);
         Imgproc.morphologyEx(vysledek, vysledek, MORPH_DILATE , kelner);
         List<MatOfPoint> contours = new ArrayList<>();
@@ -53,9 +52,9 @@ public class optic {
                 kkk.set(i, kkk.get(hh[i]));
             }
             MatOfPoint kull = new MatOfPoint();
-            Imgproc.fillConvexPoly(lmaeft, new MatOfPoint(vector_Point_to_Mat(kkk.subList(0, hh.length))), new Scalar(13, 12, 123));
+            Imgproc.fillConvexPoly(image, new MatOfPoint(vector_Point_to_Mat(kkk.subList(0, hh.length))), new Scalar(13, 12, 123));
         }
-        Util.imshow(lmaeft, window1);
+        Util.imshow(image, window1);
     }
 }
 

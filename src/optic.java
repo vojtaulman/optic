@@ -25,6 +25,7 @@ public class optic {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Mat image = Imgcodecs.imread("C:/Users/User/Downloads/mrizka.jpg");
         Mat lmaeft1 = Imgcodecs.imread("C:/Users/User/Downloads/valec.jpg");
+        System.out.println(lmaeft1.width()+"x"+lmaeft1.height());
         JFrame window = new JFrame();
         JFrame window1 = new JFrame();
         Mat vysledek = new Mat();
@@ -44,15 +45,40 @@ public class optic {
         Util.imshow(vysledek, window);
         Imgproc.findContours(vysledek, contours,mat, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
         MatOfInt hulk = new MatOfInt();
-        for (int c = 0; c < contours.size(); ++c) {
-            Imgproc.convexHull(contours.get(c), hulk);
-            int[] hh = hulk.toArray();
-            List<org.opencv.core.Point> kkk = contours.get(c).toList();
-            for (int i = 0; i < hh.length; ++i) {
-                kkk.set(i, kkk.get(hh[i]));
-            }
-            MatOfPoint kull = new MatOfPoint();
-            Imgproc.fillConvexPoly(image, new MatOfPoint(vector_Point_to_Mat(kkk.subList(0, hh.length))), new Scalar(13, 12, 123));
+        MatOfPoint2f approxCurve = new MatOfPoint2f();
+        //For each contour found
+        for (int i=0; i<contours.size(); i++)
+        {
+            //Convert contours(i) from MatOfPoint to MatOfPoint2f
+            MatOfPoint2f contour2f = new MatOfPoint2f( contours.get(i).toArray() );
+            //Processing on mMOP2f1 which is in type MatOfPoint2f
+            double approxDistance = Imgproc.arcLength(contour2f, true)*0.02;
+            Imgproc.approxPolyDP(contour2f, approxCurve, approxDistance, true);
+
+            //Convert back to MatOfPoint
+            MatOfPoint points = new MatOfPoint( approxCurve.toArray() );
+            // Get bounding rect of contour
+            Rect rect = Imgproc.boundingRect(points);
+            int pointCount = points.toList().size();
+            if (pointCount == 4 ) {
+            	Rect bounds = Imgproc.boundingRect(points);
+            	float ar = bounds.width/(float)bounds.height;
+                    //nejak mi to spatne urcuje vysku a sirku, kdyz jsem udelal spravny pomer stran v malovani tak mi to i pres to napise ze to neni plechovka :/
+            	System.out.println(bounds.width);
+            	System.out.println(bounds.height);
+            	System.out.println(ar);
+            	if (ar >= 0.70 & ar <= 0.75){
+            		System.out.println("plechovka");
+            	} else {
+            			System.out.println("neni plechovka");
+            	}
+            } else {
+        		System.out.println("neni obdelnik");
+        	}
+
+             // draw enclosing rectangle (all same color, but you could use variable i to make them unique)
+            Imgproc.rectangle(image, rect.tl(),  rect.br(), new Scalar(255, 0, 0),1, 8,0);
+
         }
         Util.imshow(image, window1);
     }
